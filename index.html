@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toko Biru — Makanan & Minuman</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
+  body {
+    background: #f4f6f9;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  /* ===== Header / Search Bar ===== */
+  header {
+    background: #007bff;
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .search-bar {
+    flex: 1;
+    background: white;
+    color: #333;
+    border-radius: 25px;
+    padding: 8px 15px;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 0.9rem;
+  }
+
+  .notif-btn {
+    position: relative;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+
+  .notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    padding: 2px 5px;
+  }
+
+  /* ===== Kategori ===== */
+  .categories {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background: white;
+    border-bottom: 1px solid #eee;
+  }
+
+  .cat {
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .cat:hover {
+    color: #007bff;
+  }
+
+  .cat i {
+    display: block;
+    font-size: 1.4rem;
+  }
+
+  /* ===== Produk ===== */
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .product {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: 0.3s;
+  }
+
+  .product:hover {
+    transform: translateY(-4px);
+  }
+
+  .product img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+  }
+
+  .product h3 {
+    font-size: 1rem;
+    padding: 8px;
+  }
+
+  .product p {
+    padding: 0 8px 8px;
+    color: #777;
+    font-size: 0.9rem;
+  }
+
+  .product button {
+    width: 90%;
+    margin: 8px 5%;
+    background: #007bff;
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .product button:hover {
+    background: #005ec2;
+  }
+
+  /* ===== Keranjang ===== */
+  .cart {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100%;
+    background: white;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: 0.3s;
+    overflow-y: auto;
+    z-index: 20;
+  }
+
+  .cart.active {
+    right: 0;
+  }
+
+  .cart h2 {
+    color: #007bff;
+    margin-bottom: 15px;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+  }
+
+  .checkout-btn {
+    background: #007bff;
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+
+  /* ===== Navbar Bawah ===== */
+  .navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #eee;
+    padding: 8px 0;
+    z-index: 15;
+  }
+
+  .nav-item {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+  }
+
+  .nav-item.active {
+    color: #007bff;
+  }
+
+  .nav-item i {
+    display: block;
+    font-size: 1.4rem;
+  }
+
+  footer {
+    text-align: center;
+    color: #666;
+    font-size: 0.8rem;
+    padding: 40px 0 70px;
+  }
+</style>
+<script src="https://kit.fontawesome.com/2f3bda9a85.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div><strong>Toko Biru</strong></div>
+    <div class="search-bar">
+      <i class="fas fa-search" style="margin-right:8px;color:#007bff;"></i>
+      <input type="text" id="search" placeholder="Cari makanan atau minuman...">
+    </div>
+    <div class="notif-btn" onclick="showNotif()">
+      <i class="fas fa-bell"></i>
+      <span class="notif-badge" id="notif-count">2</span>
+    </div>
+  </header>
+
+  <!-- KATEGORI -->
+  <div class="categories">
+    <div class="cat" onclick="filterCategory('Semua')"><i class="fas fa-th"></i> Semua</div>
+    <div class="cat" onclick="filterCategory('Makanan')"><i class="fas fa-utensils"></i> Makanan</div>
+    <div class="cat" onclick="filterCategory('Minuman')"><i class="fas fa-coffee"></i> Minuman</div>
+    <div class="cat" onclick="filterCategory('Jajanan')"><i class="fas fa-cookie-bite"></i> Jajanan</div>
+  </div>
+
+  <!-- PRODUK -->
+  <section class="products" id="product-list"></section>
+
+  <!-- KERANJANG -->
+  <div class="cart" id="cart">
+    <h2>Keranjang</h2>
+    <div id="cart-items"></div>
+    <p><strong>Total:</strong> Rp<span id="total">0</span></p>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+
+  <!-- NAVBAR BAWAH -->
+  <div class="navbar">
+    <div class="nav-item active"><i class="fas fa-home"></i>Beranda</div>
+    <div class="nav-item" onclick="openCart()"><i class="fas fa-shopping-cart"></i>Keranjang</div>
+    <div class="nav-item"><i class="fas fa-bell"></i>Notifikasi</div>
+    <div class="nav-item"><i class="fas fa-user"></i>Profil</div>
+  </div>
+
+  <footer>
+    © 2025 Toko Biru — Makanan & Minuman Segar
+  </footer>
+
+<script>
+  const products = [
+    {name: "Nasi Goreng Spesial", price: 25000, category: "Makanan", img: "https://images.unsplash.com/photo-1606755962773-0e6c4ef1bcbf"},
+    {name: "Es Teh Manis", price: 8000, category: "Minuman", img: "https://images.unsplash.com/photo-1582719478185-2c1b1d4c02ee"},
+    {name: "Burger Daging", price: 30000, category: "Makanan", img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90"},
+    {name: "Kentang Goreng", price: 15000, category: "Jajanan", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"},
+    {name: "Donat Coklat", price: 12000, category: "Jajanan", img: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3"},
+    {name: "Jus Jeruk Segar", price: 10000, category: "Minuman", img: "https://images.unsplash.com/photo-1577801597240-9a4b6b5dfb42"}
+  ];
+
+  const list = document.getElementById("product-list");
+  const cart = document.getElementById("cart");
+  const cartItems = document.getElementById("cart-items");
+  const totalEl = document.getElementById("total");
+  let cartData = [];
+
+  function showProducts(filter = "Semua") {
+    list.innerHTML = "";
+    const filtered = products.filter(p => filter === "Semua" || p.category === filter);
+    filtered.forEach(p => {
+      list.innerHTML += `
+        <div class="product">
+          <img src="${p.img}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>Rp${p.price.toLocaleString()}</p>
+          <button onclick="addToCart('${p.name}', ${p.price})">Tambah</button>
+        </div>`;
+    });
+  }
+
+  function filterCategory(cat) {
+    showProducts(cat);
+  }
+
+  function openCart() {
+    cart.classList.toggle("active");
+  }
+
+  function addToCart(name, price) {
+    const found = cartData.find(i => i.name === name);
+    if (found) found.qty++;
+    else cartData.push({name, price, qty: 1});
+    updateCart();
+  }
+
+  function updateCart() {
+    cartItems.innerHTML = "";
+    let total = 0;
+    cartData.forEach(item => {
+      total += item.price * item.qty;
+      cartItems.innerHTML += `
+        <div class="cart-item">
+          <span>${item.name} x${item.qty}</span>
+          <span>Rp${(item.price * item.qty).toLocaleString()}</span>
+        </div>`;
+    });
+    totalEl.textContent = total.toLocaleString();
+  }
+
+  function checkout() {
+    if (cartData.length === 0) return alert("Keranjang kosong!");
+    alert("Terima kasih! Pesanan Anda sedang diproses.");
+    cartData = [];
+    updateCart();
+    cart.classList.remove("active");
+  }
+
+  function showNotif() {
+    alert("Anda memiliki 2 notifikasi baru!");
+    document.getElementById("notif-count").style.display = "none";
+  }
+
+  document.getElementById("search").addEventListener("input", e => {
+    const keyword = e.target.value.toLowerCase();
+    const results = products.filter(p => p.name.toLowerCase().includes(keyword));
+    list.innerHTML = "";
+    results.forEach(p => {
+      list.innerHTML += `
+        <div class="product">
+          <img src="${p.img}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>Rp${p.price.toLocaleString()}</p>
+          <button onclick="addToCart('${p.name}', ${p.price})">Tambah</button>
+        </div>`;
+    });
+  });
+
+  // Tampilkan semua produk awal
+  showProducts();
+</script>
+</body>
+  </html>
