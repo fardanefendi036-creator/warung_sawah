@@ -1,118 +1,207 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Toko Biru</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TokoBlue — Web Shop Demo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- HEADER -->
-  <header>
-    <h1>🛍️ Toko Biru</h1>
-    <div class="icons">
-      <span class="icon" onclick="openPopup('notifPopup')">🔔</span>
-      <span class="icon" onclick="toggleCart()">🛒<span class="cart-count">0</span></span>
-    </div>
-  </header>
+  <div class="app">
+    <!-- Top navbar -->
+    <header class="topbar">
+      <div class="brand">
+        <h1>TokoBlue</h1>
+        <small>Belanja makanan & minuman</small>
+      </div>
 
-  <!-- SEARCH BAR -->
-  <div class="search-bar">
-    <input type="text" id="searchInput" onkeyup="searchProduct()" placeholder="Cari makanan, minuman, atau jajan..." />
+      <div class="top-actions">
+        <div class="search">
+          <input id="searchInput" placeholder="Cari produk, mis. 'Nasi Goreng'..." />
+          <button id="btnSearch">Cari</button>
+        </div>
+
+        <div class="icons">
+          <button id="btnNotif" class="icon-btn" title="Notifikasi">🔔<span id="notifBadge" class="badge hide">0</span></button>
+          <button id="btnProfile" class="icon-btn" title="Profil">👤</button>
+          <button id="btnCart" class="icon-btn" title="Keranjang">🛒<span id="cartBadge" class="badge hide">0</span></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main layout: sidebar + content -->
+    <main class="main">
+      <aside class="sidebar">
+        <div class="side-card">
+          <h3>Kategori</h3>
+          <ul id="categoryList">
+            <!-- populated by JS -->
+          </ul>
+        </div>
+
+        <div class="side-card">
+          <h3>Akun</h3>
+          <p id="userInfo">Belum login</p>
+          <div class="side-actions">
+            <button id="openLogin" class="btn small">Login</button>
+            <button id="openRegister" class="btn outline small">Register</button>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <h3>Info</h3>
+          <p>Demo statis — produk dan keranjang disimpan lokal (localStorage).</p>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="filters-row">
+          <div id="selectedCategory" class="chip">Semua</div>
+          <div class="spacer"></div>
+          <select id="sortSelect">
+            <option value="popular">Urut: Populer</option>
+            <option value="price-asc">Harga: Rendah → Tinggi</option>
+            <option value="price-desc">Harga: Tinggi → Rendah</option>
+            <option value="name">A → Z</option>
+          </select>
+        </div>
+
+        <div id="productsGrid" class="grid">
+          <!-- products injected by JS -->
+        </div>
+      </section>
+
+      <!-- Right cart panel -->
+      <aside id="cartPanel" class="cart-panel">
+        <div class="cart-head">
+          <h3>Keranjang</h3>
+          <button id="closeCart" class="btn-icon">✕</button>
+        </div>
+        <div id="cartItems" class="cart-items"></div>
+        <div class="cart-footer">
+          <div>Total: <strong id="cartTotal">Rp0</strong></div>
+          <div class="cart-actions">
+            <button id="clearCart" class="btn outline small">Kosongkan</button>
+            <button id="openCheckout" class="btn primary">Checkout</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      &copy; 2025 TokoBlue — Demo Web Shop
+    </footer>
   </div>
 
-  <!-- KATEGORI -->
-  <div class="categories">
-    <button onclick="filterCategory('all')" class="active">Semua</button>
-    <button onclick="filterCategory('makanan')">Makanan</button>
-    <button onclick="filterCategory('minuman')">Minuman</button>
-    <button onclick="filterCategory('jajanan')">Jajanan</button>
-  </div>
-
-  <!-- PRODUK -->
-  <section class="products" id="productList">
-    <div class="product" data-category="makanan">
-      <img src="https://images.unsplash.com/photo-1606755962773-0e6c4ef1bcbf" alt="Nasi Goreng" />
-      <h3>Nasi Goreng Spesial</h3>
-      <p>Rp25.000</p>
-      <button onclick="addToCart('Nasi Goreng Spesial', 25000)">Tambah</button>
-    </div>
-
-    <div class="product" data-category="minuman">
-      <img src="https://images.unsplash.com/photo-1582719478185-2c1b1d4c02ee" alt="Es Teh" />
-      <h3>Es Teh Manis</h3>
-      <p>Rp8.000</p>
-      <button onclick="addToCart('Es Teh Manis', 8000)">Tambah</button>
-    </div>
-
-    <div class="product" data-category="makanan">
-      <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90" alt="Burger" />
-      <h3>Burger Daging</h3>
-      <p>Rp30.000</p>
-      <button onclick="addToCart('Burger Daging', 30000)">Tambah</button>
-    </div>
-
-    <div class="product" data-category="jajanan">
-      <img src="https://images.unsplash.com/photo-1589308078059-be1415eab4c3" alt="Donat" />
-      <h3>Donat Coklat</h3>
-      <p>Rp12.000</p>
-      <button onclick="addToCart('Donat Coklat', 12000)">Tambah</button>
-    </div>
-
-    <div class="product" data-category="minuman">
-      <img src="https://images.unsplash.com/photo-1565958011705-44e211f8319a" alt="Kopi Susu" />
-      <h3>Kopi Susu</h3>
-      <p>Rp15.000</p>
-      <button onclick="addToCart('Kopi Susu', 15000)">Tambah</button>
-    </div>
-  </section>
-
-  <!-- KERANJANG -->
-  <div class="cart-panel" id="cartPanel">
-    <h2>Keranjang Belanja</h2>
-    <div id="cartItems"></div>
-    <p><strong>Total:</strong> Rp<span id="total">0</span></p>
-    <button class="checkout-btn" onclick="openCheckout()">Checkout</button>
-  </div>
-
-  <!-- POPUP CHECKOUT -->
-  <div class="popup" id="checkoutPopup">
-    <div class="popup-content">
-      <h2>Checkout</h2>
-      <p>Total belanja: Rp<span id="checkoutTotal">0</span></p>
-      <button class="confirm-btn" onclick="confirmCheckout()">Konfirmasi</button>
-      <button class="cancel-btn" onclick="closePopup('checkoutPopup')">Kembali</button>
+  <!-- POPUPS (modal) -->
+  <!-- Checkout popup -->
+  <div id="checkoutModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Checkout</h3>
+        <button class="modal-close" data-close="checkoutModal">Kembali</button>
+      </header>
+      <div class="modal-body">
+        <div id="checkoutSummary">Total: Rp0</div>
+        <div class="form-row">
+          <label>Nama Penerima</label>
+          <input id="checkoutName" placeholder="Nama lengkap" />
+        </div>
+        <div class="form-row">
+          <label>Alamat</label>
+          <input id="checkoutAddress" placeholder="Alamat pengiriman" />
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn outline" data-close="checkoutModal">Kembali</button>
+        <button id="confirmCheckoutBtn" class="btn primary">Konfirmasi & Bayar</button>
+      </footer>
     </div>
   </div>
 
-  <!-- POPUP NOTIFIKASI -->
-  <div class="popup" id="notifPopup">
-    <div class="popup-content">
-      <h2>Notifikasi 🔔</h2>
-      <p>Tidak ada notifikasi baru saat ini.</p>
-      <button class="cancel-btn" onclick="closePopup('notifPopup')">Tutup</button>
+  <!-- Notification popup -->
+  <div id="notifModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Notifikasi</h3>
+        <button class="modal-close" data-close="notifModal">Kembali</button>
+      </header>
+      <div class="modal-body" id="notifList">
+        <!-- notifications inserted here -->
+      </div>
+      <footer class="modal-footer">
+        <button class="btn outline" data-close="notifModal">Kembali</button>
+      </footer>
     </div>
   </div>
 
-  <!-- POPUP PROFIL -->
-  <div class="popup" id="profilePopup">
-    <div class="popup-content">
-      <h2>Profil Pengguna 👤</h2>
-      <p>Nama: <strong>Fardan Ef</strong></p>
-      <p>Status: Member Aktif</p>
-      <button class="cancel-btn" onclick="closePopup('profilePopup')">Tutup</button>
+  <!-- Profile popup -->
+  <div id="profileModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Profil</h3>
+        <button class="modal-close" data-close="profileModal">Kembali</button>
+      </header>
+      <div class="modal-body" id="profileBody">
+        <!-- profile info -->
+      </div>
+      <footer class="modal-footer">
+        <button class="btn outline" data-close="profileModal">Kembali</button>
+      </footer>
     </div>
   </div>
 
-  <!-- NAV BAWAH -->
-  <nav class="bottom-nav">
-    <a href="#" class="active">🏠</a>
-    <a href="#" onclick="toggleCart()">🛒</a>
-    <a href="#" onclick="openPopup('notifPopup')">🔔</a>
-    <a href="#" onclick="openPopup('profilePopup')">👤</a>
-  </nav>
+  <!-- Login popup -->
+  <div id="loginModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Login</h3>
+        <button class="modal-close" data-close="loginModal">Kembali</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>Email</label>
+          <input id="loginEmail" placeholder="email@contoh.com" />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="loginPass" type="password" placeholder="••••••" />
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn outline" data-close="loginModal">Kembali</button>
+        <button id="loginBtn" class="btn primary">Login</button>
+      </footer>
+    </div>
+  </div>
 
-  <footer>&copy; 2025 Toko Biru. Semua Hak Dilindungi.</footer>
+  <!-- Register popup -->
+  <div id="registerModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Register</h3>
+        <button class="modal-close" data-close="registerModal">Kembali</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>Nama</label>
+          <input id="regName" placeholder="Nama lengkap" />
+        </div>
+        <div class="form-row">
+          <label>Email</label>
+          <input id="regEmail" placeholder="email@contoh.com" />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="regPass" type="password" placeholder="••••••" />
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn outline" data-close="registerModal">Kembali</button>
+        <button id="registerBtn" class="btn primary">Daftar</button>
+      </footer>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
